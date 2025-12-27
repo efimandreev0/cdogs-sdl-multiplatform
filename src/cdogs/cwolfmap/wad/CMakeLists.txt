@@ -8,7 +8,7 @@ else()
 		-fsigned-char
 		-Wall -W
 		-Wpointer-arith
-		-Wno-cast-qual -Wno-conversion -Wno-parentheses -Wno-pointer-sign -Wno-sign-compare -Wno-strict-prototypes -Wno-switch -Wno-unused-parameter)
+		-Wno-cast-qual -Wno-conversion -Wno-parentheses -Wno-pointer-sign -Wno-sign-compare -Wno-strict-prototypes -Wno-switch)
 endif()
 
 add_library(wad STATIC ${WAD_SOURCES} ${WAD_HEADERS})

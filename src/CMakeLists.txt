@@ -75,6 +75,18 @@ if(WIN32)
 endif()
 add_executable(cdogs-sdl
 	${CDOGS_SDL_SOURCES} ${CDOGS_SDL_HEADERS} ${CDOGS_SDL_EXTRA})
+
+if(VITA)
+	set(VITA_TITLEID  "CDOGSSDL0")
+	set(VITA_VERSION  "01.00")
+	set(VITA_MKSFOEX_FLAGS "-d ATTRIBUTE2=12")
+	vita_create_self(eboot.bin cdogs-sdl UNSAFE)
+
+	vita_create_vpk(CDogs.vpk ${VITA_TITLEID} eboot.bin
+			VERSION ${VITA_VERSION}
+			NAME "C-Dogs SDL"
+	)
+endif()
 if(APPLE)
 	set_target_properties(cdogs-sdl PROPERTIES
 		MACOSX_RPATH 1
@@ -85,7 +97,49 @@ elseif(MSVC)
 	# Increase stack size to avoid stack overflows
 	set_target_properties(cdogs-sdl PROPERTIES LINK_FLAGS /STACK:10000000)
 endif()
-target_link_libraries(cdogs-sdl cdogs cdogs_proto ${EXTRA_LIBRARIES})
+target_link_libraries(cdogs-sdl cdogs cdogs_proto
+		${EXTRA_LIBRARIES}
+		SDL2_mixer
+		SDL2
+		opusfile
+		opus
+		vorbisfile
+		vorbisenc
+		vorbis
+		ogg
+		modplug
+		xmp
+		mikmod
+		mad
+		mpg123
+		taihen_stub
+		vitaGL
+		mathneon
+		curl
+		ssl
+		crypto
+		SceAppMgr_stub
+		SceAppUtil_stub
+		SceAudio_stub
+		SceAudioIn_stub
+		SceCtrl_stub
+		SceCommonDialog_stub
+		SceDisplay_stub
+		SceGxm_stub
+		SceNet_stub
+		SceKernelDmacMgr_stub
+		SceFios2_stub
+		SceTouch_stub
+		SceHid_stub
+		ScePower_stub
+		taihen_stub
+		kubridge_stub
+		vitashark
+		SceShaccCg_stub
+		m
+		stdc++
+)
+
 
 if(GCW0)
 	add_custom_command(TARGET cdogs-sdl

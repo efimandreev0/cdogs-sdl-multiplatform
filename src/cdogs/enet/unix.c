@@ -8,7 +8,9 @@
 
 #include <sys/types.h>
 #include <sys/socket.h>
+#ifndef __vita__
 #include <sys/ioctl.h>
+#endif
 #include <sys/time.h>
 #include <arpa/inet.h>
 #include <netinet/tcp.h>
@@ -294,7 +296,11 @@ enet_socket_get_address (ENetSocket socket, ENetAddress * address)
 int 
 enet_socket_listen (ENetSocket socket, int backlog)
 {
+#ifndef __vita__
     return listen (socket, backlog < 0 ? SOMAXCONN : backlog);
+#else
+	return -1;
+#endif
 }
 
 ENetSocket

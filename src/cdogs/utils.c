@@ -48,7 +48,9 @@
 */
 #define _BSD_SOURCE
 #define _DEFAULT_SOURCE
-
+#ifdef __vita__
+#include <vitasdk.h>
+#endif
 #include "utils.h"
 
 #include <assert.h>
@@ -391,6 +393,19 @@ void RelPathFromCWD(char *buf, const char *to)
 
 void GetDataFilePath(char *buf, const char *path)
 {
+#ifdef __vita__
+	// Проверяем, не абсолютный ли путь уже (на всякий случай)
+	if (strncmp(path, "ux0:", 4) == 0)
+	{
+		strcpy(buf, path);
+	}
+	else
+	{
+		sprintf(buf, "%s%s", CDOGS_DATA_DIR, path);
+	}
+
+	sceClibPrintf("VITA PATH: %s\n", buf);
+#else
 	if (IsAbsolutePath(path))
 	{
 		strcpy(buf, path);
@@ -413,6 +428,7 @@ void GetDataFilePath(char *buf, const char *path)
 		sprintf(relbuf, "%s/%s%s", cwd, CDOGS_DATA_DIR, path);
 	}
 	RealPath(relbuf, buf);
+#endif
 }
 
 static bool IsAbsolutePath(const char *path)

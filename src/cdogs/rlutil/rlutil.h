@@ -60,17 +60,21 @@
 	#define getch _getch
 	#define kbhit _kbhit
 #else
-	#include <termios.h> // for getch() and kbhit()
-	#include <unistd.h> // for getch(), kbhit() and (u)sleep()
+
+#ifndef __vita__
 	#include <sys/ioctl.h> // for getkey()
+#endif
 	#include <sys/types.h> // for kbhit()
 	#include <sys/time.h> // for kbhit()
-
+#ifdef __vita__
+#endif
 /// Function: getch
 /// Get character without waiting for Return to be pressed.
 /// Windows has this in conio.h
 RLUTIL_INLINE int getch(void) {
-	// Here be magic.
+#ifdef __vita__
+	return getchar();
+#else
 	struct termios oldt, newt;
 	int ch;
 	tcgetattr(STDIN_FILENO, &oldt);
@@ -80,30 +84,34 @@ RLUTIL_INLINE int getch(void) {
 	ch = getchar();
 	tcsetattr(STDIN_FILENO, TCSANOW, &oldt);
 	return ch;
+#endif
 }
 
 /// Function: kbhit
 /// Determines if keyboard has been hit.
 /// Windows has this in conio.h
 RLUTIL_INLINE int kbhit(void) {
-	// Here be dragons.
+#ifdef __vita__
+	return 0; // На Вите нет классического kbhit через ioctl
+#else
 	static struct termios oldt, newt;
 	int cnt = 0;
 	tcgetattr(STDIN_FILENO, &oldt);
 	newt = oldt;
 	newt.c_lflag    &= ~(ICANON | ECHO);
-	newt.c_iflag     = 0; // input mode
-	newt.c_oflag     = 0; // output mode
-	newt.c_cc[VMIN]  = 1; // minimum time to wait
-	newt.c_cc[VTIME] = 1; // minimum characters to wait for
+	newt.c_iflag     = 0;
+	newt.c_oflag     = 0;
+	newt.c_cc[VMIN]  = 1;
+	newt.c_cc[VTIME] = 1;
 	tcsetattr(STDIN_FILENO, TCSANOW, &newt);
-	ioctl(0, FIONREAD, &cnt); // Read count
+	ioctl(0, FIONREAD, &cnt);
 	struct timeval tv;
 	tv.tv_sec  = 0;
 	tv.tv_usec = 100;
-	select(STDIN_FILENO+1, NULL, NULL, NULL, &tv); // A small time delay
+	select(STDIN_FILENO+1, NULL, NULL, NULL, &tv);
 	tcsetattr(STDIN_FILENO, TCSANOW, &oldt);
-	return cnt; // Return number of characters
+	return cnt;
+#endif
 }
 #endif // _WIN32
 
@@ -648,7 +656,9 @@ RLUTIL_INLINE int trows(void) {
 	else
 		return csbi.srWindow.Bottom - csbi.srWindow.Top + 1; // Window height
 		// return csbi.dwSize.Y; // Buffer height
-#else
+#elif defined(__vita__)
+	return 24; // Дефолтное значение для консоли
+	#else
 #ifdef TIOCGSIZE
 	struct ttysize ts;
 	ioctl(STDIN_FILENO, TIOCGSIZE, &ts);
@@ -673,7 +683,9 @@ RLUTIL_INLINE int tcols(void) {
 	else
 		return csbi.srWindow.Right - csbi.srWindow.Left + 1; // Window width
 		// return csbi.dwSize.X; // Buffer width
-#else
+#elif defined(__vita__)
+	return 80; // Дефолтное значение
+	#else
 #ifdef TIOCGSIZE
 	struct ttysize ts;
 	ioctl(STDIN_FILENO, TIOCGSIZE, &ts);

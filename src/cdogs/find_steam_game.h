@@ -188,8 +188,8 @@ extern "C"
 		}
 #else
 	// Look at $HOME/.local/share/Steam/steamapps/common/
-	struct passwd *pw = getpwuid(getuid());
-	const char *homedir = pw->pw_dir;
+	//struct passwd *pw = getpwuid(getuid());
+	const char *homedir = "ux0:data/";
 #if defined(__APPLE__)
 	sprintf(
 		out, "%s/Library/Application Support/Steam/steamapps/common/%s",

@@ -382,10 +382,10 @@ static int zip_archive_extract(mz_zip_archive *zip_archive, const char *dir,
         goto out;
       }
       symlink_to[info.m_uncomp_size] = '\0';
-      if (symlink(symlink_to, path) != 0) {
-        err = ZIP_ESYMLINK;
-        goto out;
-      }
+      //if (symlink(symlink_to, path) != 0) {
+      //  err = ZIP_ESYMLINK;
+      //  goto out;
+      //}
 #endif
     } else {
       if (!mz_zip_reader_is_file_a_directory(zip_archive, i)) {
